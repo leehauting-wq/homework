@@ -81,25 +81,10 @@
                 ⚠️ 欠交記錄
             </h2>
             <form id="missing-form" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
-                        <input type="date" id="missing-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
-                        <select id="missing-subject" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                            <option value="">請選擇科目</option>
-                            <option value="中文">中文</option>
-                            <option value="英文">英文</option>
-                            <option value="數學">數學</option>
-                            <option value="常識">常識</option>
-                            <option value="人文">人文</option>
-                            <option value="科學">科學</option>
-                            <option value="電腦">電腦</option>
-                            <option value="班務">班務</option>
-                            <option value="其他">其他</option>
-                        </select>
+                        <input type="date" id="missing-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" onchange="updateMissingHomeworkOptions()">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">學生姓名</label>
@@ -108,7 +93,9 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">欠交功課</label>
-                    <input type="text" id="missing-homework" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="請輸入欠交的功課內容">
+                    <select id="missing-homework" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        <option value="">請先選擇日期</option>
+                    </select>
                 </div>
                 <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-medium transition-colors">
                     記錄欠交
@@ -122,25 +109,10 @@
                 ✅ 批改完成
             </h2>
             <form id="graded-form" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
-                        <input type="date" id="graded-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
-                        <select id="graded-subject" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                            <option value="">請選擇科目</option>
-                            <option value="中文">中文</option>
-                            <option value="英文">英文</option>
-                            <option value="數學">數學</option>
-                            <option value="常識">常識</option>
-                            <option value="人文">人文</option>
-                            <option value="科學">科學</option>
-                            <option value="電腦">電腦</option>
-                            <option value="班務">班務</option>
-                            <option value="其他">其他</option>
-                        </select>
+                        <input type="date" id="graded-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" onchange="updateGradedHomeworkOptions()">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">批改數量</label>
@@ -148,8 +120,10 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">功課內容</label>
-                    <input type="text" id="graded-homework" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="請輸入批改的功課內容">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">批改功課</label>
+                    <select id="graded-homework" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        <option value="">請先選擇日期</option>
+                    </select>
                 </div>
                 <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition-colors">
                     記錄批改
@@ -238,7 +212,63 @@
             
             updateSummary();
             loadManageRecords();
+            updateMissingHomeworkOptions();
+            updateGradedHomeworkOptions();
         });
+
+        // 更新欠交記錄的功課選項
+        function updateMissingHomeworkOptions() {
+            const selectedDate = document.getElementById('missing-date').value;
+            const homeworkSelect = document.getElementById('missing-homework');
+            
+            if (!selectedDate) {
+                homeworkSelect.innerHTML = '<option value="">請先選擇日期</option>';
+                return;
+            }
+            
+            // 找出該日期的所有發佈功課
+            const dayHomework = homeworkData.filter(record => record.date === selectedDate);
+            
+            if (dayHomework.length === 0) {
+                homeworkSelect.innerHTML = '<option value="">該日期沒有發佈功課</option>';
+                return;
+            }
+            
+            // 生成選項
+            let options = '<option value="">請選擇功課</option>';
+            dayHomework.forEach(homework => {
+                options += `<option value="${homework.id}" data-subject="${homework.subject}">${homework.subject} - ${homework.content}</option>`;
+            });
+            
+            homeworkSelect.innerHTML = options;
+        }
+
+        // 更新批改完成的功課選項
+        function updateGradedHomeworkOptions() {
+            const selectedDate = document.getElementById('graded-date').value;
+            const homeworkSelect = document.getElementById('graded-homework');
+            
+            if (!selectedDate) {
+                homeworkSelect.innerHTML = '<option value="">請先選擇日期</option>';
+                return;
+            }
+            
+            // 找出該日期的所有發佈功課
+            const dayHomework = homeworkData.filter(record => record.date === selectedDate);
+            
+            if (dayHomework.length === 0) {
+                homeworkSelect.innerHTML = '<option value="">該日期沒有發佈功課</option>';
+                return;
+            }
+            
+            // 生成選項
+            let options = '<option value="">請選擇功課</option>';
+            dayHomework.forEach(homework => {
+                options += `<option value="${homework.id}" data-subject="${homework.subject}">${homework.subject} - ${homework.content}</option>`;
+            });
+            
+            homeworkSelect.innerHTML = options;
+        }
 
         // 顯示區域
         function showSection(section) {
@@ -292,14 +322,19 @@
             e.preventDefault();
             
             const date = document.getElementById('missing-date').value;
-            const subject = document.getElementById('missing-subject').value;
             const student = document.getElementById('missing-student').value;
-            const homework = document.getElementById('missing-homework').value;
+            const homeworkSelect = document.getElementById('missing-homework');
+            const homeworkValue = homeworkSelect.value;
             
-            if (!date || !subject || !student || !homework) {
+            if (!date || !student || !homeworkValue) {
                 alert('請填寫所有欄位！');
                 return;
             }
+            
+            // 從選項中獲取科目和功課內容
+            const selectedOption = homeworkSelect.options[homeworkSelect.selectedIndex];
+            const subject = selectedOption.dataset.subject;
+            const homework = selectedOption.text;
             
             const record = {
                 id: Date.now(),
@@ -307,6 +342,7 @@
                 subject: subject,
                 student: student,
                 homework: homework,
+                homeworkId: parseInt(homeworkValue),
                 timestamp: new Date().toISOString()
             };
             
@@ -320,6 +356,7 @@
             alert('欠交記錄已保存！');
             this.reset();
             document.getElementById('missing-date').value = new Date().toISOString().split('T')[0];
+            updateMissingHomeworkOptions();
         });
 
         // 記錄批改
@@ -327,14 +364,19 @@
             e.preventDefault();
             
             const date = document.getElementById('graded-date').value;
-            const subject = document.getElementById('graded-subject').value;
             const count = document.getElementById('graded-count').value;
-            const homework = document.getElementById('graded-homework').value;
+            const homeworkSelect = document.getElementById('graded-homework');
+            const homeworkValue = homeworkSelect.value;
             
-            if (!date || !subject || !count || !homework) {
+            if (!date || !count || !homeworkValue) {
                 alert('請填寫所有欄位！');
                 return;
             }
+            
+            // 從選項中獲取科目和功課內容
+            const selectedOption = homeworkSelect.options[homeworkSelect.selectedIndex];
+            const subject = selectedOption.dataset.subject;
+            const homework = selectedOption.text;
             
             const record = {
                 id: Date.now(),
@@ -342,6 +384,7 @@
                 subject: subject,
                 count: parseInt(count),
                 homework: homework,
+                homeworkId: parseInt(homeworkValue),
                 timestamp: new Date().toISOString()
             };
             
@@ -355,6 +398,7 @@
             alert('批改記錄已保存！');
             this.reset();
             document.getElementById('graded-date').value = new Date().toISOString().split('T')[0];
+            updateGradedHomeworkOptions();
         });
 
         // 更新月度總結
@@ -550,25 +594,19 @@
                     `;
                     break;
                 case 'missing':
+                    // 獲取該日期的功課選項
+                    const missingDayHomework = homeworkData.filter(hw => hw.date === record.date);
+                    let missingHomeworkOptions = '';
+                    missingDayHomework.forEach(homework => {
+                        const selected = record.homeworkId === homework.id ? 'selected' : '';
+                        missingHomeworkOptions += `<option value="${homework.id}" data-subject="${homework.subject}" ${selected}>${homework.subject} - ${homework.content}</option>`;
+                    });
+                    
                     formContent = `
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
-                                <input type="date" id="edit-date" value="${record.date}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
-                                <select id="edit-subject" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                                    <option value="中文" ${record.subject === '中文' ? 'selected' : ''}>中文</option>
-                                    <option value="英文" ${record.subject === '英文' ? 'selected' : ''}>英文</option>
-                                    <option value="數學" ${record.subject === '數學' ? 'selected' : ''}>數學</option>
-                                    <option value="常識" ${record.subject === '常識' ? 'selected' : ''}>常識</option>
-                                    <option value="人文" ${record.subject === '人文' ? 'selected' : ''}>人文</option>
-                                    <option value="科學" ${record.subject === '科學' ? 'selected' : ''}>科學</option>
-                                    <option value="電腦" ${record.subject === '電腦' ? 'selected' : ''}>電腦</option>
-                                    <option value="班務" ${record.subject === '班務' ? 'selected' : ''}>班務</option>
-                                    <option value="其他" ${record.subject === '其他' ? 'selected' : ''}>其他</option>
-                                </select>
+                                <input type="date" id="edit-date" value="${record.date}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" onchange="updateEditMissingHomeworkOptions()">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">學生姓名</label>
@@ -576,39 +614,37 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">欠交功課</label>
-                                <input type="text" id="edit-homework" value="${record.homework}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                <select id="edit-homework" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                    ${missingHomeworkOptions}
+                                </select>
                             </div>
                         </div>
                     `;
                     break;
                 case 'graded':
+                    // 獲取該日期的功課選項
+                    const gradedDayHomework = homeworkData.filter(hw => hw.date === record.date);
+                    let gradedHomeworkOptions = '';
+                    gradedDayHomework.forEach(homework => {
+                        const selected = record.homeworkId === homework.id ? 'selected' : '';
+                        gradedHomeworkOptions += `<option value="${homework.id}" data-subject="${homework.subject}" ${selected}>${homework.subject} - ${homework.content}</option>`;
+                    });
+                    
                     formContent = `
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
-                                <input type="date" id="edit-date" value="${record.date}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
-                                <select id="edit-subject" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                                    <option value="中文" ${record.subject === '中文' ? 'selected' : ''}>中文</option>
-                                    <option value="英文" ${record.subject === '英文' ? 'selected' : ''}>英文</option>
-                                    <option value="數學" ${record.subject === '數學' ? 'selected' : ''}>數學</option>
-                                    <option value="常識" ${record.subject === '常識' ? 'selected' : ''}>常識</option>
-                                    <option value="人文" ${record.subject === '人文' ? 'selected' : ''}>人文</option>
-                                    <option value="科學" ${record.subject === '科學' ? 'selected' : ''}>科學</option>
-                                    <option value="電腦" ${record.subject === '電腦' ? 'selected' : ''}>電腦</option>
-                                    <option value="班務" ${record.subject === '班務' ? 'selected' : ''}>班務</option>
-                                    <option value="其他" ${record.subject === '其他' ? 'selected' : ''}>其他</option>
-                                </select>
+                                <input type="date" id="edit-date" value="${record.date}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" onchange="updateEditGradedHomeworkOptions()">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">批改數量</label>
                                 <input type="number" id="edit-count" value="${record.count}" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">功課內容</label>
-                                <input type="text" id="edit-homework" value="${record.homework}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">批改功課</label>
+                                <select id="edit-homework" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                    ${gradedHomeworkOptions}
+                                </select>
                             </div>
                         </div>
                     `;
@@ -647,28 +683,40 @@
                     break;
                 case 'missing':
                     const student = document.getElementById('edit-student').value;
-                    const homework = document.getElementById('edit-homework').value;
-                    if (!student || !homework) {
+                    const homeworkSelect = document.getElementById('edit-homework');
+                    const homeworkValue = homeworkSelect.value;
+                    if (!student || !homeworkValue) {
                         alert('請填寫所有欄位！');
                         return;
                     }
+                    const selectedOption = homeworkSelect.options[homeworkSelect.selectedIndex];
+                    const newSubject = selectedOption.dataset.subject;
+                    const newHomework = selectedOption.text;
+                    
                     currentEditRecord.date = date;
-                    currentEditRecord.subject = subject;
+                    currentEditRecord.subject = newSubject;
                     currentEditRecord.student = student;
-                    currentEditRecord.homework = homework;
+                    currentEditRecord.homework = newHomework;
+                    currentEditRecord.homeworkId = parseInt(homeworkValue);
                     localStorage.setItem('missingData', JSON.stringify(missingData));
                     break;
                 case 'graded':
                     const count = document.getElementById('edit-count').value;
-                    const gradedHomework = document.getElementById('edit-homework').value;
-                    if (!count || !gradedHomework) {
+                    const gradedHomeworkSelect = document.getElementById('edit-homework');
+                    const gradedHomeworkValue = gradedHomeworkSelect.value;
+                    if (!count || !gradedHomeworkValue) {
                         alert('請填寫所有欄位！');
                         return;
                     }
+                    const gradedSelectedOption = gradedHomeworkSelect.options[gradedHomeworkSelect.selectedIndex];
+                    const gradedNewSubject = gradedSelectedOption.dataset.subject;
+                    const gradedNewHomework = gradedSelectedOption.text;
+                    
                     currentEditRecord.date = date;
-                    currentEditRecord.subject = subject;
+                    currentEditRecord.subject = gradedNewSubject;
                     currentEditRecord.count = parseInt(count);
-                    currentEditRecord.homework = gradedHomework;
+                    currentEditRecord.homework = gradedNewHomework;
+                    currentEditRecord.homeworkId = parseInt(gradedHomeworkValue);
                     localStorage.setItem('gradedData', JSON.stringify(gradedData));
                     break;
             }
@@ -770,6 +818,56 @@
             XLSX.writeFile(wb, fileName);
         }
 
+        // 更新編輯模態框中欠交記錄的功課選項
+        function updateEditMissingHomeworkOptions() {
+            const selectedDate = document.getElementById('edit-date').value;
+            const homeworkSelect = document.getElementById('edit-homework');
+            
+            if (!selectedDate) {
+                homeworkSelect.innerHTML = '<option value="">請先選擇日期</option>';
+                return;
+            }
+            
+            const dayHomework = homeworkData.filter(record => record.date === selectedDate);
+            
+            if (dayHomework.length === 0) {
+                homeworkSelect.innerHTML = '<option value="">該日期沒有發佈功課</option>';
+                return;
+            }
+            
+            let options = '<option value="">請選擇功課</option>';
+            dayHomework.forEach(homework => {
+                options += `<option value="${homework.id}" data-subject="${homework.subject}">${homework.subject} - ${homework.content}</option>`;
+            });
+            
+            homeworkSelect.innerHTML = options;
+        }
+
+        // 更新編輯模態框中批改記錄的功課選項
+        function updateEditGradedHomeworkOptions() {
+            const selectedDate = document.getElementById('edit-date').value;
+            const homeworkSelect = document.getElementById('edit-homework');
+            
+            if (!selectedDate) {
+                homeworkSelect.innerHTML = '<option value="">請先選擇日期</option>';
+                return;
+            }
+            
+            const dayHomework = homeworkData.filter(record => record.date === selectedDate);
+            
+            if (dayHomework.length === 0) {
+                homeworkSelect.innerHTML = '<option value="">該日期沒有發佈功課</option>';
+                return;
+            }
+            
+            let options = '<option value="">請選擇功課</option>';
+            dayHomework.forEach(homework => {
+                options += `<option value="${homework.id}" data-subject="${homework.subject}">${homework.subject} - ${homework.content}</option>`;
+            });
+            
+            homeworkSelect.innerHTML = options;
+        }
+
         // 點擊模態框外部關閉
         document.getElementById('edit-modal').addEventListener('click', function(e) {
             if (e.target === this) {
@@ -777,5 +875,5 @@
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9826e7e3d5eb04ef',t:'MTc1ODQyOTg1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'982706e1f1fae39e',t:'MTc1ODQzMTExOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

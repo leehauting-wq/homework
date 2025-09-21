@@ -278,6 +278,10 @@
             homeworkData.push(record);
             localStorage.setItem('homeworkData', JSON.stringify(homeworkData));
             
+            // 即時更新所有相關顯示
+            updateSummary();
+            loadManageRecords();
+            
             alert('功課發佈成功！');
             this.reset();
             document.getElementById('homework-date').value = new Date().toISOString().split('T')[0];
@@ -309,6 +313,10 @@
             missingData.push(record);
             localStorage.setItem('missingData', JSON.stringify(missingData));
             
+            // 即時更新所有相關顯示
+            updateSummary();
+            loadManageRecords();
+            
             alert('欠交記錄已保存！');
             this.reset();
             document.getElementById('missing-date').value = new Date().toISOString().split('T')[0];
@@ -339,6 +347,10 @@
             
             gradedData.push(record);
             localStorage.setItem('gradedData', JSON.stringify(gradedData));
+            
+            // 即時更新所有相關顯示
+            updateSummary();
+            loadManageRecords();
             
             alert('批改記錄已保存！');
             this.reset();
@@ -765,5 +777,5 @@
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9826ccac7644f4f8',t:'MTc1ODQyODczNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9826e7e3d5eb04ef',t:'MTc1ODQyOTg1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

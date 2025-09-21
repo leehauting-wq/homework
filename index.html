@@ -87,18 +87,34 @@
                         <input type="date" id="missing-record-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">功課發佈日期</label>
-                        <input type="date" id="missing-homework-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" onchange="updateMissingHomeworkOptions()">
-                    </div>
-                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">學生姓名</label>
                         <input type="text" id="missing-student" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="請輸入學生姓名">
                     </div>
+                    <div></div>
                 </div>
+                
+                <!-- 功課搜尋區域 -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-medium text-gray-800 mb-4">🔍 搜尋功課</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">功課發佈日期</label>
+                            <input type="date" id="missing-homework-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" onchange="updateMissingHomeworkOptions()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">輸入功課項目</label>
+                            <input type="text" id="missing-homework-search" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="輸入關鍵字搜尋功課..." oninput="searchMissingHomework()">
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600 mb-2">
+                        💡 提示：可以選擇特定日期查看該日功課，或輸入關鍵字搜尋所有功課
+                    </div>
+                </div>
+                
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">欠交功課</label>
                     <select id="missing-homework" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                        <option value="">請先選擇功課發佈日期</option>
+                        <option value="">請選擇功課發佈日期或輸入關鍵字搜尋</option>
                     </select>
                 </div>
                 <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-medium transition-colors">
@@ -113,24 +129,39 @@
                 ✅ 批改完成
             </h2>
             <form id="graded-form" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">批改完成記錄日期</label>
                         <input type="date" id="graded-record-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">功課發佈日期</label>
-                        <input type="date" id="graded-homework-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" onchange="updateGradedHomeworkOptions()">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">批改數量</label>
                         <input type="number" id="graded-count" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="請輸入批改數量">
                     </div>
                 </div>
+                
+                <!-- 功課搜尋區域 -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-medium text-gray-800 mb-4">🔍 搜尋功課</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">功課發佈日期</label>
+                            <input type="date" id="graded-homework-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" onchange="updateGradedHomeworkOptions()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">輸入功課項目</label>
+                            <input type="text" id="graded-homework-search" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="輸入關鍵字搜尋功課..." oninput="searchGradedHomework()">
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600 mb-2">
+                        💡 提示：可以選擇特定日期查看該日功課，或輸入關鍵字搜尋所有功課
+                    </div>
+                </div>
+                
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">批改功課</label>
                     <select id="graded-homework" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                        <option value="">請先選擇功課發佈日期</option>
+                        <option value="">請選擇功課發佈日期或輸入關鍵字搜尋</option>
                     </select>
                 </div>
                 <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition-colors">
@@ -222,14 +253,15 @@
             
             updateSummary();
             loadManageRecords();
-            updateMissingHomeworkOptions();
-            updateGradedHomeworkOptions();
         });
 
         // 更新欠交記錄的功課選項
         function updateMissingHomeworkOptions() {
             const selectedDate = document.getElementById('missing-homework-date').value;
             const homeworkSelect = document.getElementById('missing-homework');
+            
+            // 清空搜尋欄位
+            document.getElementById('missing-homework-search').value = '';
             
             if (!selectedDate) {
                 homeworkSelect.innerHTML = '<option value="">請先選擇功課發佈日期</option>';
@@ -247,7 +279,40 @@
             // 生成選項
             let options = '<option value="">請選擇功課</option>';
             dayHomework.forEach(homework => {
-                options += `<option value="${homework.id}" data-subject="${homework.subject}">${homework.subject} - ${homework.content}</option>`;
+                options += `<option value="${homework.id}" data-subject="${homework.subject}" data-date="${homework.date}">${homework.subject} - ${homework.content} (${homework.date})</option>`;
+            });
+            
+            homeworkSelect.innerHTML = options;
+        }
+
+        // 搜尋欠交記錄的功課
+        function searchMissingHomework() {
+            const searchKeyword = document.getElementById('missing-homework-search').value.toLowerCase();
+            const homeworkSelect = document.getElementById('missing-homework');
+            
+            // 清空日期選擇
+            document.getElementById('missing-homework-date').value = '';
+            
+            if (!searchKeyword.trim()) {
+                homeworkSelect.innerHTML = '<option value="">請選擇功課發佈日期或輸入關鍵字搜尋</option>';
+                return;
+            }
+            
+            // 在所有功課中搜尋包含關鍵字的項目
+            const matchedHomework = homeworkData.filter(homework => 
+                homework.content.toLowerCase().includes(searchKeyword) ||
+                homework.subject.toLowerCase().includes(searchKeyword)
+            );
+            
+            if (matchedHomework.length === 0) {
+                homeworkSelect.innerHTML = '<option value="">沒有找到相關功課</option>';
+                return;
+            }
+            
+            // 生成搜尋結果選項
+            let options = '<option value="">請選擇功課</option>';
+            matchedHomework.forEach(homework => {
+                options += `<option value="${homework.id}" data-subject="${homework.subject}" data-date="${homework.date}">${homework.subject} - ${homework.content} (${homework.date})</option>`;
             });
             
             homeworkSelect.innerHTML = options;
@@ -258,6 +323,9 @@
             const selectedDate = document.getElementById('graded-homework-date').value;
             const homeworkSelect = document.getElementById('graded-homework');
             
+            // 清空搜尋欄位
+            document.getElementById('graded-homework-search').value = '';
+            
             if (!selectedDate) {
                 homeworkSelect.innerHTML = '<option value="">請先選擇功課發佈日期</option>';
                 return;
@@ -274,7 +342,40 @@
             // 生成選項
             let options = '<option value="">請選擇功課</option>';
             dayHomework.forEach(homework => {
-                options += `<option value="${homework.id}" data-subject="${homework.subject}">${homework.subject} - ${homework.content}</option>`;
+                options += `<option value="${homework.id}" data-subject="${homework.subject}" data-date="${homework.date}">${homework.subject} - ${homework.content} (${homework.date})</option>`;
+            });
+            
+            homeworkSelect.innerHTML = options;
+        }
+
+        // 搜尋批改完成的功課
+        function searchGradedHomework() {
+            const searchKeyword = document.getElementById('graded-homework-search').value.toLowerCase();
+            const homeworkSelect = document.getElementById('graded-homework');
+            
+            // 清空日期選擇
+            document.getElementById('graded-homework-date').value = '';
+            
+            if (!searchKeyword.trim()) {
+                homeworkSelect.innerHTML = '<option value="">請選擇功課發佈日期或輸入關鍵字搜尋</option>';
+                return;
+            }
+            
+            // 在所有功課中搜尋包含關鍵字的項目
+            const matchedHomework = homeworkData.filter(homework => 
+                homework.content.toLowerCase().includes(searchKeyword) ||
+                homework.subject.toLowerCase().includes(searchKeyword)
+            );
+            
+            if (matchedHomework.length === 0) {
+                homeworkSelect.innerHTML = '<option value="">沒有找到相關功課</option>';
+                return;
+            }
+            
+            // 生成搜尋結果選項
+            let options = '<option value="">請選擇功課</option>';
+            matchedHomework.forEach(homework => {
+                options += `<option value="${homework.id}" data-subject="${homework.subject}" data-date="${homework.date}">${homework.subject} - ${homework.content} (${homework.date})</option>`;
             });
             
             homeworkSelect.innerHTML = options;
@@ -332,19 +433,19 @@
             e.preventDefault();
             
             const recordDate = document.getElementById('missing-record-date').value;
-            const homeworkDate = document.getElementById('missing-homework-date').value;
             const student = document.getElementById('missing-student').value;
             const homeworkSelect = document.getElementById('missing-homework');
             const homeworkValue = homeworkSelect.value;
             
-            if (!recordDate || !homeworkDate || !student || !homeworkValue) {
+            if (!recordDate || !student || !homeworkValue) {
                 alert('請填寫所有欄位！');
                 return;
             }
             
-            // 從選項中獲取科目和功課內容
+            // 從選項中獲取科目、功課內容和發佈日期
             const selectedOption = homeworkSelect.options[homeworkSelect.selectedIndex];
             const subject = selectedOption.dataset.subject;
+            const homeworkDate = selectedOption.dataset.date;
             const homework = selectedOption.text;
             
             const record = {
@@ -369,8 +470,9 @@
             this.reset();
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('missing-record-date').value = today;
-            document.getElementById('missing-homework-date').value = today;
-            updateMissingHomeworkOptions();
+            document.getElementById('missing-homework-date').value = '';
+            document.getElementById('missing-homework-search').value = '';
+            document.getElementById('missing-homework').innerHTML = '<option value="">請選擇功課發佈日期或輸入關鍵字搜尋</option>';
         });
 
         // 記錄批改
@@ -378,19 +480,19 @@
             e.preventDefault();
             
             const recordDate = document.getElementById('graded-record-date').value;
-            const homeworkDate = document.getElementById('graded-homework-date').value;
             const count = document.getElementById('graded-count').value;
             const homeworkSelect = document.getElementById('graded-homework');
             const homeworkValue = homeworkSelect.value;
             
-            if (!recordDate || !homeworkDate || !count || !homeworkValue) {
+            if (!recordDate || !count || !homeworkValue) {
                 alert('請填寫所有欄位！');
                 return;
             }
             
-            // 從選項中獲取科目和功課內容
+            // 從選項中獲取科目、功課內容和發佈日期
             const selectedOption = homeworkSelect.options[homeworkSelect.selectedIndex];
             const subject = selectedOption.dataset.subject;
+            const homeworkDate = selectedOption.dataset.date;
             const homework = selectedOption.text;
             
             const record = {
@@ -415,8 +517,9 @@
             this.reset();
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('graded-record-date').value = today;
-            document.getElementById('graded-homework-date').value = today;
-            updateGradedHomeworkOptions();
+            document.getElementById('graded-homework-date').value = '';
+            document.getElementById('graded-homework-search').value = '';
+            document.getElementById('graded-homework').innerHTML = '<option value="">請選擇功課發佈日期或輸入關鍵字搜尋</option>';
         });
 
         // 更新月度總結
@@ -911,5 +1014,5 @@
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'982713f1c4bb219a',t:'MTc1ODQzMTY1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98272dc5b15b84c1',t:'MTc1ODQzMjcxMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

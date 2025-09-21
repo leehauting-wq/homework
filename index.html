@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小學教師功課管理系統</title>
+    <title>功課管理系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -19,820 +19,751 @@
             <p class="text-gray-600">輕鬆管理每日功課、追蹤進度</p>
         </div>
 
-        <!-- 日期和月份選擇器 -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- 導航選單 -->
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+            <button onclick="showSection('homework')" class="nav-btn bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                📝 發佈功課
+            </button>
+            <button onclick="showSection('missing')" class="nav-btn bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                ⚠️ 欠交記錄
+            </button>
+            <button onclick="showSection('graded')" class="nav-btn bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                ✅ 批改完成
+            </button>
+            <button onclick="showSection('summary')" class="nav-btn bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                📊 月度總結
+            </button>
+            <button onclick="showSection('manage')" class="nav-btn bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                🗂️ 記錄管理
+            </button>
+        </div>
+
+        <!-- 發佈功課區域 -->
+        <div id="homework-section" class="section bg-white rounded-xl shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                📝 發佈功課
+            </h2>
+            <form id="homework-form" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
+                        <input type="date" id="homework-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
+                        <select id="homework-subject" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">請選擇科目</option>
+                            <option value="中文">中文</option>
+                            <option value="英文">英文</option>
+                            <option value="數學">數學</option>
+                            <option value="常識">常識</option>
+                            <option value="人文">人文</option>
+                            <option value="科學">科學</option>
+                            <option value="電腦">電腦</option>
+                            <option value="班務">班務</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                </div>
                 <div>
-                    <h2 class="text-xl font-semibold text-gray-800 mb-2">📅 選擇日期</h2>
-                    <input type="date" id="selectedDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">功課內容</label>
+                    <textarea id="homework-content" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="請輸入功課內容..."></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-medium transition-colors">
+                    發佈功課
+                </button>
+            </form>
+        </div>
+
+        <!-- 欠交記錄區域 -->
+        <div id="missing-section" class="section bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                ⚠️ 欠交記錄
+            </h2>
+            <form id="missing-form" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
+                        <input type="date" id="missing-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
+                        <select id="missing-subject" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                            <option value="">請選擇科目</option>
+                            <option value="中文">中文</option>
+                            <option value="英文">英文</option>
+                            <option value="數學">數學</option>
+                            <option value="常識">常識</option>
+                            <option value="人文">人文</option>
+                            <option value="科學">科學</option>
+                            <option value="電腦">電腦</option>
+                            <option value="班務">班務</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">學生姓名</label>
+                        <input type="text" id="missing-student" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="請輸入學生姓名">
+                    </div>
                 </div>
                 <div>
-                    <h2 class="text-xl font-semibold text-gray-800 mb-2">📊 查看月份總結</h2>
-                    <input type="month" id="selectedMonth" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">欠交功課</label>
+                    <input type="text" id="missing-homework" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="請輸入欠交的功課內容">
                 </div>
+                <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-medium transition-colors">
+                    記錄欠交
+                </button>
+            </form>
+        </div>
+
+        <!-- 批改完成區域 -->
+        <div id="graded-section" class="section bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                ✅ 批改完成
+            </h2>
+            <form id="graded-form" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
+                        <input type="date" id="graded-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
+                        <select id="graded-subject" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            <option value="">請選擇科目</option>
+                            <option value="中文">中文</option>
+                            <option value="英文">英文</option>
+                            <option value="數學">數學</option>
+                            <option value="常識">常識</option>
+                            <option value="人文">人文</option>
+                            <option value="科學">科學</option>
+                            <option value="電腦">電腦</option>
+                            <option value="班務">班務</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">批改數量</label>
+                        <input type="number" id="graded-count" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="請輸入批改數量">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">功課內容</label>
+                    <input type="text" id="graded-homework" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="請輸入批改的功課內容">
+                </div>
+                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition-colors">
+                    記錄批改
+                </button>
+            </form>
+        </div>
+
+        <!-- 月度總結區域 -->
+        <div id="summary-section" class="section bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                📊 月度總結
+            </h2>
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">選擇月份</label>
+                <input type="month" id="summary-month" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" onchange="updateSummary()">
+            </div>
+            <div id="summary-stats" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- 統計卡片將在這裡動態生成 -->
+            </div>
+            <div class="flex gap-4">
+                <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    📊 匯出Excel
+                </button>
             </div>
         </div>
 
-        <!-- 統計卡片 -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow" onclick="showDetailPage('homework')">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-700">📝 今日功課</h3>
-                        <p class="text-3xl font-bold text-blue-600" id="homeworkCount">0</p>
-                    </div>
-                    <div class="text-4xl">📋</div>
+        <!-- 記錄管理區域 -->
+        <div id="manage-section" class="section bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                🗂️ 記錄管理
+            </h2>
+            <div class="mb-6">
+                <div class="flex flex-wrap gap-4 mb-4">
+                    <select id="manage-type" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent" onchange="loadManageRecords()">
+                        <option value="homework">發佈功課</option>
+                        <option value="missing">欠交記錄</option>
+                        <option value="graded">批改完成</option>
+                    </select>
+                    <input type="month" id="manage-month" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent" onchange="loadManageRecords()">
                 </div>
             </div>
-            
-            <div class="bg-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow" onclick="showDetailPage('missing')">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-700">⚠️ 欠交記錄</h3>
-                        <p class="text-3xl font-bold text-red-600" id="missingCount">0</p>
-                    </div>
-                    <div class="text-4xl">📊</div>
-                </div>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow" onclick="showDetailPage('graded')">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-700">✅ 已批改</h3>
-                        <p class="text-3xl font-bold text-green-600" id="gradedCount">0</p>
-                    </div>
-                    <div class="text-4xl">✨</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 主要內容區域 -->
-        <div id="mainContent">
-            <!-- 功能選項卡 -->
-            <div class="bg-white rounded-xl shadow-lg mb-6">
-                <div class="flex border-b">
-                    <button class="tab-btn flex-1 py-4 px-6 text-center font-medium border-b-2 border-blue-500 text-blue-600" data-tab="homework">📝 發佈功課</button>
-                    <button class="tab-btn flex-1 py-4 px-6 text-center font-medium text-gray-500 hover:text-gray-700" data-tab="missing">⚠️ 欠交追蹤</button>
-                    <button class="tab-btn flex-1 py-4 px-6 text-center font-medium text-gray-500 hover:text-gray-700" data-tab="graded">✅ 批改記錄</button>
-                </div>
-            </div>
-
-            <!-- 發佈功課 -->
-            <div id="homeworkTab" class="tab-content bg-white rounded-xl shadow-lg p-6">
-                <h3 class="text-xl font-semibold mb-4 text-gray-800">📝 發佈新功課</h3>
-                <form id="homeworkForm" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
-                            <select id="homeworkSubject" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                <option value="中文">中文</option>
-                                <option value="英文">英文</option>
-                                <option value="數學">數學</option>
-                                <option value="常識">常識</option>
-                                <option value="人文">人文</option>
-                                <option value="科學">科學</option>
-                                <option value="電腦">電腦</option>
-                                <option value="班務">班務</option>
-                                <option value="其他">其他</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">截止日期</label>
-                            <input type="date" id="homeworkDueDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">功課內容</label>
-                        <textarea id="homeworkContent" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="請輸入功課詳細內容..."></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">📝 發佈功課</button>
-                </form>
-            </div>
-
-            <!-- 欠交追蹤 -->
-            <div id="missingTab" class="tab-content bg-white rounded-xl shadow-lg p-6 hidden">
-                <h3 class="text-xl font-semibold mb-4 text-gray-800">⚠️ 記錄欠交學生</h3>
-                <form id="missingForm" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
-                            <select id="missingSubject" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
-                                <option value="中文">中文</option>
-                                <option value="英文">英文</option>
-                                <option value="數學">數學</option>
-                                <option value="常識">常識</option>
-                                <option value="人文">人文</option>
-                                <option value="科學">科學</option>
-                                <option value="電腦">電腦</option>
-                                <option value="班務">班務</option>
-                                <option value="其他">其他</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">學生姓名</label>
-                            <input type="text" id="studentName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500" placeholder="請輸入學生姓名">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">欠交功課</label>
-                        <input type="text" id="missingHomework" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500" placeholder="請輸入欠交的功課內容">
-                    </div>
-                    <button type="submit" class="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium">⚠️ 記錄欠交</button>
-                </form>
-            </div>
-
-            <!-- 批改記錄 -->
-            <div id="gradedTab" class="tab-content bg-white rounded-xl shadow-lg p-6 hidden">
-                <h3 class="text-xl font-semibold mb-4 text-gray-800">✅ 記錄批改完成</h3>
-                <form id="gradedForm" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
-                            <select id="gradedSubject" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
-                                <option value="中文">中文</option>
-                                <option value="英文">英文</option>
-                                <option value="數學">數學</option>
-                                <option value="常識">常識</option>
-                                <option value="人文">人文</option>
-                                <option value="科學">科學</option>
-                                <option value="電腦">電腦</option>
-                                <option value="班務">班務</option>
-                                <option value="其他">其他</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">批改數量</label>
-                            <input type="number" id="gradedCount" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="請輸入批改數量">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">功課類型</label>
-                        <input type="text" id="gradedHomework" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="請輸入批改的功課類型">
-                    </div>
-                    <button type="submit" class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium">✅ 記錄批改</button>
-                </form>
-            </div>
-
-            <!-- 每月總結 -->
-            <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-semibold text-gray-800">📊 每月總結</h3>
-                    <div class="flex space-x-2">
-                        <button onclick="exportDailyToExcel()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">📥 匯出當日</button>
-                        <button onclick="exportMonthlyToExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium">📥 匯出整月</button>
-                    </div>
-                </div>
-                <div id="monthlySummary" class="space-y-4">
-                    <!-- 動態生成內容 -->
-                </div>
-            </div>
-        </div>
-
-        <!-- 詳細記錄頁面 -->
-        <div id="detailPage" class="hidden">
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 id="detailTitle" class="text-2xl font-bold text-gray-800"></h2>
-                    <button onclick="showMainPage()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">← 返回主頁</button>
-                </div>
-                <div id="detailContent" class="space-y-4">
-                    <!-- 動態生成內容 -->
-                </div>
+            <div id="manage-records" class="space-y-4">
+                <!-- 記錄將在這裡動態生成 -->
             </div>
         </div>
     </div>
 
     <!-- 編輯模態框 -->
-    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4">
-            <h3 class="text-lg font-semibold mb-4">編輯記錄</h3>
-            <form id="editForm" class="space-y-4">
-                <input type="hidden" id="editId">
-                <input type="hidden" id="editType">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
-                    <select id="editSubject" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                        <option value="中文">中文</option>
-                        <option value="英文">英文</option>
-                        <option value="數學">數學</option>
-                        <option value="常識">常識</option>
-                        <option value="人文">人文</option>
-                        <option value="科學">科學</option>
-                        <option value="電腦">電腦</option>
-                        <option value="班務">班務</option>
-                        <option value="其他">其他</option>
-                    </select>
-                </div>
-                <div id="editFields">
-                    <!-- 動態生成編輯欄位 -->
-                </div>
-                <div class="flex space-x-3">
-                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">保存</button>
-                    <button type="button" onclick="closeEditModal()" class="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700">取消</button>
-                </div>
-            </form>
+            <h3 class="text-xl font-bold text-gray-800 mb-4">編輯記錄</h3>
+            <div id="edit-form-content">
+                <!-- 編輯表單將在這裡動態生成 -->
+            </div>
+            <div class="flex gap-4 mt-6">
+                <button onclick="saveEdit()" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-medium transition-colors">
+                    保存
+                </button>
+                <button onclick="closeEditModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg font-medium transition-colors">
+                    取消
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        // 全局變數
-        let currentDate = new Date().toISOString().split('T')[0];
-        let currentMonth = new Date().toISOString().slice(0, 7);
-        let currentDetailType = '';
+        // 數據存儲
+        let homeworkData = JSON.parse(localStorage.getItem('homeworkData')) || [];
+        let missingData = JSON.parse(localStorage.getItem('missingData')) || [];
+        let gradedData = JSON.parse(localStorage.getItem('gradedData')) || [];
+        let currentEditRecord = null;
+        let currentEditType = null;
 
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('selectedDate').value = currentDate;
-            document.getElementById('selectedMonth').value = currentMonth;
-            loadData();
-            loadMonthlyData();
-            setupEventListeners();
+            // 設置默認日期為今天
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('homework-date').value = today;
+            document.getElementById('missing-date').value = today;
+            document.getElementById('graded-date').value = today;
+            
+            // 設置默認月份為當前月份
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            document.getElementById('summary-month').value = currentMonth;
+            document.getElementById('manage-month').value = currentMonth;
+            
+            updateSummary();
+            loadManageRecords();
         });
 
-        // 設置事件監聽器
-        function setupEventListeners() {
-            // 日期變更
-            document.getElementById('selectedDate').addEventListener('change', function() {
-                currentDate = this.value;
-                loadData();
-            });
-
-            // 月份變更
-            document.getElementById('selectedMonth').addEventListener('change', function() {
-                currentMonth = this.value;
-                loadMonthlyData();
-            });
-
-            // 選項卡切換
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const tabName = this.dataset.tab;
-                    switchTab(tabName);
-                });
-            });
-
-            // 表單提交
-            document.getElementById('homeworkForm').addEventListener('submit', handleHomeworkSubmit);
-            document.getElementById('missingForm').addEventListener('submit', handleMissingSubmit);
-            document.getElementById('gradedForm').addEventListener('submit', handleGradedSubmit);
-            document.getElementById('editForm').addEventListener('submit', handleEditSubmit);
-        }
-
-        // 切換選項卡
-        function switchTab(tabName) {
-            // 更新按鈕樣式
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('border-blue-500', 'text-blue-600');
-                btn.classList.add('text-gray-500');
-            });
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('border-blue-500', 'text-blue-600');
-            document.querySelector(`[data-tab="${tabName}"]`).classList.remove('text-gray-500');
-
-            // 顯示對應內容
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-            document.getElementById(`${tabName}Tab`).classList.remove('hidden');
-        }
-
-        // 處理功課發佈
-        function handleHomeworkSubmit(e) {
-            e.preventDefault();
-            const data = {
-                id: Date.now(),
-                date: currentDate,
-                subject: document.getElementById('homeworkSubject').value,
-                content: document.getElementById('homeworkContent').value,
-                dueDate: document.getElementById('homeworkDueDate').value,
-                timestamp: new Date().toLocaleString('zh-TW')
-            };
-
-            saveRecord('homework', data);
-            document.getElementById('homeworkForm').reset();
-            loadData();
-            alert('功課發佈成功！');
-        }
-
-        // 處理欠交記錄
-        function handleMissingSubmit(e) {
-            e.preventDefault();
-            const data = {
-                id: Date.now(),
-                date: currentDate,
-                subject: document.getElementById('missingSubject').value,
-                studentName: document.getElementById('studentName').value,
-                homework: document.getElementById('missingHomework').value,
-                timestamp: new Date().toLocaleString('zh-TW')
-            };
-
-            saveRecord('missing', data);
-            document.getElementById('missingForm').reset();
-            loadData();
-            alert('欠交記錄已保存！');
-        }
-
-        // 處理批改記錄
-        function handleGradedSubmit(e) {
-            e.preventDefault();
-            const data = {
-                id: Date.now(),
-                date: currentDate,
-                subject: document.getElementById('gradedSubject').value,
-                homework: document.getElementById('gradedHomework').value,
-                count: document.getElementById('gradedCount').value,
-                timestamp: new Date().toLocaleString('zh-TW')
-            };
-
-            saveRecord('graded', data);
-            document.getElementById('gradedForm').reset();
-            loadData();
-            alert('批改記錄已保存！');
-        }
-
-        // 保存記錄
-        function saveRecord(type, data) {
-            const key = `${type}_${currentDate}`;
-            let records = JSON.parse(localStorage.getItem(key) || '[]');
-            records.push(data);
-            localStorage.setItem(key, JSON.stringify(records));
-        }
-
-        // 載入數據
-        function loadData() {
-            const homework = JSON.parse(localStorage.getItem(`homework_${currentDate}`) || '[]');
-            const missing = JSON.parse(localStorage.getItem(`missing_${currentDate}`) || '[]');
-            const graded = JSON.parse(localStorage.getItem(`graded_${currentDate}`) || '[]');
-
-            // 更新統計
-            document.getElementById('homeworkCount').textContent = homework.length;
-            document.getElementById('missingCount').textContent = missing.length;
-            document.getElementById('gradedCount').textContent = graded.reduce((sum, item) => sum + parseInt(item.count || 0), 0);
-
-            // 更新每日總結
-            updateDailySummary(homework, missing, graded);
-        }
-
-        // 載入月份數據
-        function loadMonthlyData() {
-            const monthlyData = getMonthlyRecords(currentMonth);
-            updateMonthlySummary(monthlyData);
-        }
-
-        // 獲取月份記錄
-        function getMonthlyRecords(month) {
-            const allRecords = { homework: [], missing: [], graded: [] };
+        // 顯示區域
+        function showSection(section) {
+            // 隱藏所有區域
+            document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
+            // 顯示選中區域
+            document.getElementById(section + '-section').classList.remove('hidden');
             
-            // 獲取該月份所有日期的記錄
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.includes(month)) {
-                    const [type, date] = key.split('_');
-                    if (['homework', 'missing', 'graded'].includes(type)) {
-                        const records = JSON.parse(localStorage.getItem(key) || '[]');
-                        records.forEach(record => {
-                            record.recordDate = date; // 添加記錄日期
-                        });
-                        allRecords[type] = allRecords[type].concat(records);
-                    }
-                }
-            }
+            // 更新導航按鈕樣式
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-white');
+            });
+            event.target.classList.add('ring-2', 'ring-white');
+        }
+
+        // 發佈功課
+        document.getElementById('homework-form').addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            return allRecords;
-        }
-
-        // 更新每月總結
-        function updateMonthlySummary(monthlyData) {
-            const summaryDiv = document.getElementById('monthlySummary');
-            let html = '';
-
-            const totalHomework = monthlyData.homework.length;
-            const totalMissing = monthlyData.missing.length;
-            const totalGraded = monthlyData.graded.reduce((sum, item) => sum + parseInt(item.count || 0), 0);
-
-            if (totalHomework === 0 && totalMissing === 0 && totalGraded === 0) {
-                html = '<p class="text-gray-500 text-center py-8">本月暫無記錄</p>';
-            } else {
-                // 月份統計
-                html += `<div class="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg mb-6">
-                    <h4 class="font-bold text-lg mb-2">📊 ${currentMonth} 月份統計</h4>
-                    <div class="grid grid-cols-3 gap-4 text-center">
-                        <div class="bg-white p-3 rounded-lg">
-                            <div class="text-2xl font-bold text-blue-600">${totalHomework}</div>
-                            <div class="text-sm text-gray-600">發佈功課</div>
-                        </div>
-                        <div class="bg-white p-3 rounded-lg">
-                            <div class="text-2xl font-bold text-red-600">${totalMissing}</div>
-                            <div class="text-sm text-gray-600">欠交記錄</div>
-                        </div>
-                        <div class="bg-white p-3 rounded-lg">
-                            <div class="text-2xl font-bold text-green-600">${totalGraded}</div>
-                            <div class="text-sm text-gray-600">批改數量</div>
-                        </div>
-                    </div>
-                </div>`;
-
-                // 按日期分組顯示
-                const dateGroups = {};
-                ['homework', 'missing', 'graded'].forEach(type => {
-                    monthlyData[type].forEach(record => {
-                        if (!dateGroups[record.recordDate]) {
-                            dateGroups[record.recordDate] = { homework: [], missing: [], graded: [] };
-                        }
-                        dateGroups[record.recordDate][type].push(record);
-                    });
-                });
-
-                const sortedDates = Object.keys(dateGroups).sort().reverse();
-                
-                sortedDates.forEach(date => {
-                    const dateData = dateGroups[date];
-                    html += `<div class="border border-gray-200 rounded-lg p-4 mb-4">
-                        <h5 class="font-semibold text-lg mb-3 text-gray-800">📅 ${date}</h5>`;
-
-                    // 功課發佈
-                    if (dateData.homework.length > 0) {
-                        html += '<div class="border-l-4 border-blue-500 pl-4 mb-3"><h6 class="font-medium text-blue-700 mb-2">📝 發佈功課</h6>';
-                        dateData.homework.forEach(item => {
-                            html += `<div class="bg-blue-50 p-3 rounded-lg mb-2 flex justify-between items-start">
-                                <div>
-                                    <span class="font-medium">${item.subject}</span> - ${item.content}
-                                    ${item.dueDate ? `<br><small class="text-gray-600">截止：${item.dueDate}</small>` : ''}
-                                </div>
-                                <div class="flex space-x-2">
-                                    <button onclick="editMonthlyRecord('homework', ${item.id}, '${date}')" class="text-blue-600 hover:text-blue-800">✏️</button>
-                                    <button onclick="deleteMonthlyRecord('homework', ${item.id}, '${date}')" class="text-red-600 hover:text-red-800">🗑️</button>
-                                </div>
-                            </div>`;
-                        });
-                        html += '</div>';
-                    }
-
-                    // 欠交記錄
-                    if (dateData.missing.length > 0) {
-                        html += '<div class="border-l-4 border-red-500 pl-4 mb-3"><h6 class="font-medium text-red-700 mb-2">⚠️ 欠交記錄</h6>';
-                        dateData.missing.forEach(item => {
-                            html += `<div class="bg-red-50 p-3 rounded-lg mb-2 flex justify-between items-start">
-                                <div>
-                                    <span class="font-medium">${item.subject}</span> - ${item.studentName} 欠交：${item.homework}
-                                </div>
-                                <div class="flex space-x-2">
-                                    <button onclick="editMonthlyRecord('missing', ${item.id}, '${date}')" class="text-blue-600 hover:text-blue-800">✏️</button>
-                                    <button onclick="deleteMonthlyRecord('missing', ${item.id}, '${date}')" class="text-red-600 hover:text-red-800">🗑️</button>
-                                </div>
-                            </div>`;
-                        });
-                        html += '</div>';
-                    }
-
-                    // 批改記錄
-                    if (dateData.graded.length > 0) {
-                        html += '<div class="border-l-4 border-green-500 pl-4"><h6 class="font-medium text-green-700 mb-2">✅ 批改記錄</h6>';
-                        dateData.graded.forEach(item => {
-                            html += `<div class="bg-green-50 p-3 rounded-lg mb-2 flex justify-between items-start">
-                                <div>
-                                    <span class="font-medium">${item.subject}</span> - ${item.homework} (${item.count}份)
-                                </div>
-                                <div class="flex space-x-2">
-                                    <button onclick="editMonthlyRecord('graded', ${item.id}, '${date}')" class="text-blue-600 hover:text-blue-800">✏️</button>
-                                    <button onclick="deleteMonthlyRecord('graded', ${item.id}, '${date}')" class="text-red-600 hover:text-red-800">🗑️</button>
-                                </div>
-                            </div>`;
-                        });
-                        html += '</div>';
-                    }
-
-                    html += '</div>';
-                });
-            }
-
-            summaryDiv.innerHTML = html;
-        }
-
-        // 顯示詳細頁面
-        function showDetailPage(type) {
-            currentDetailType = type;
-            const titles = {
-                homework: '📝 功課發佈記錄',
-                missing: '⚠️ 欠交記錄管理',
-                graded: '✅ 批改記錄管理'
-            };
-
-            document.getElementById('detailTitle').textContent = titles[type];
-            document.getElementById('mainContent').classList.add('hidden');
-            document.getElementById('detailPage').classList.remove('hidden');
-
-            loadDetailRecords(type);
-        }
-
-        // 載入詳細記錄
-        function loadDetailRecords(type) {
-            const records = JSON.parse(localStorage.getItem(`${type}_${currentDate}`) || '[]');
-            const detailContent = document.getElementById('detailContent');
+            const date = document.getElementById('homework-date').value;
+            const subject = document.getElementById('homework-subject').value;
+            const content = document.getElementById('homework-content').value;
             
-            if (records.length === 0) {
-                detailContent.innerHTML = '<p class="text-gray-500 text-center py-8">暫無記錄</p>';
+            if (!date || !subject || !content) {
+                alert('請填寫所有欄位！');
                 return;
             }
-
-            let html = '<div class="space-y-4">';
-            records.forEach(record => {
-                html += `<div class="border border-gray-200 rounded-lg p-4">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">`;
-                
-                if (type === 'homework') {
-                    html += `<h4 class="font-semibold text-lg">${record.subject}</h4>
-                             <p class="text-gray-700 mt-1">${record.content}</p>
-                             ${record.dueDate ? `<p class="text-sm text-gray-500 mt-2">截止日期：${record.dueDate}</p>` : ''}`;
-                } else if (type === 'missing') {
-                    html += `<h4 class="font-semibold text-lg">${record.subject} - ${record.studentName}</h4>
-                             <p class="text-gray-700 mt-1">欠交：${record.homework}</p>`;
-                } else if (type === 'graded') {
-                    html += `<h4 class="font-semibold text-lg">${record.subject}</h4>
-                             <p class="text-gray-700 mt-1">${record.homework} (${record.count}份)</p>`;
-                }
-                
-                html += `<p class="text-xs text-gray-400 mt-2">記錄時間：${record.timestamp}</p>
-                        </div>
-                        <div class="flex space-x-2 ml-4">
-                            <button onclick="editRecord('${type}', ${record.id})" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">編輯</button>
-                            <button onclick="deleteRecord('${type}', ${record.id})" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm">刪除</button>
-                        </div>
-                    </div>
-                </div>`;
-            });
-            html += '</div>';
             
-            detailContent.innerHTML = html;
+            const record = {
+                id: Date.now(),
+                date: date,
+                subject: subject,
+                content: content,
+                timestamp: new Date().toISOString()
+            };
+            
+            homeworkData.push(record);
+            localStorage.setItem('homeworkData', JSON.stringify(homeworkData));
+            
+            alert('功課發佈成功！');
+            this.reset();
+            document.getElementById('homework-date').value = new Date().toISOString().split('T')[0];
+        });
+
+        // 記錄欠交
+        document.getElementById('missing-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const date = document.getElementById('missing-date').value;
+            const subject = document.getElementById('missing-subject').value;
+            const student = document.getElementById('missing-student').value;
+            const homework = document.getElementById('missing-homework').value;
+            
+            if (!date || !subject || !student || !homework) {
+                alert('請填寫所有欄位！');
+                return;
+            }
+            
+            const record = {
+                id: Date.now(),
+                date: date,
+                subject: subject,
+                student: student,
+                homework: homework,
+                timestamp: new Date().toISOString()
+            };
+            
+            missingData.push(record);
+            localStorage.setItem('missingData', JSON.stringify(missingData));
+            
+            alert('欠交記錄已保存！');
+            this.reset();
+            document.getElementById('missing-date').value = new Date().toISOString().split('T')[0];
+        });
+
+        // 記錄批改
+        document.getElementById('graded-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const date = document.getElementById('graded-date').value;
+            const subject = document.getElementById('graded-subject').value;
+            const count = document.getElementById('graded-count').value;
+            const homework = document.getElementById('graded-homework').value;
+            
+            if (!date || !subject || !count || !homework) {
+                alert('請填寫所有欄位！');
+                return;
+            }
+            
+            const record = {
+                id: Date.now(),
+                date: date,
+                subject: subject,
+                count: parseInt(count),
+                homework: homework,
+                timestamp: new Date().toISOString()
+            };
+            
+            gradedData.push(record);
+            localStorage.setItem('gradedData', JSON.stringify(gradedData));
+            
+            alert('批改記錄已保存！');
+            this.reset();
+            document.getElementById('graded-date').value = new Date().toISOString().split('T')[0];
+        });
+
+        // 更新月度總結
+        function updateSummary() {
+            const selectedMonth = document.getElementById('summary-month').value;
+            if (!selectedMonth) return;
+            
+            const [year, month] = selectedMonth.split('-');
+            
+            // 篩選該月份的數據
+            const monthHomework = homeworkData.filter(record => 
+                record.date.startsWith(selectedMonth)
+            );
+            const monthMissing = missingData.filter(record => 
+                record.date.startsWith(selectedMonth)
+            );
+            const monthGraded = gradedData.filter(record => 
+                record.date.startsWith(selectedMonth)
+            );
+            
+            // 計算統計數據
+            const totalHomework = monthHomework.length;
+            const totalMissing = monthMissing.length;
+            const totalGraded = monthGraded.reduce((sum, record) => sum + record.count, 0);
+            
+            // 生成統計卡片
+            const statsContainer = document.getElementById('summary-stats');
+            statsContainer.innerHTML = `
+                <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500 cursor-pointer hover:bg-blue-100 transition-colors" onclick="showDetailRecords('homework', '${selectedMonth}')">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-600 text-sm font-medium">發佈功課</p>
+                            <p class="text-3xl font-bold text-blue-800">${totalHomework}</p>
+                        </div>
+                        <div class="text-blue-500 text-2xl">📝</div>
+                    </div>
+                </div>
+                <div class="bg-red-50 p-6 rounded-lg border-l-4 border-red-500 cursor-pointer hover:bg-red-100 transition-colors" onclick="showDetailRecords('missing', '${selectedMonth}')">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-red-600 text-sm font-medium">欠交記錄</p>
+                            <p class="text-3xl font-bold text-red-800">${totalMissing}</p>
+                        </div>
+                        <div class="text-red-500 text-2xl">⚠️</div>
+                    </div>
+                </div>
+                <div class="bg-green-50 p-6 rounded-lg border-l-4 border-green-500 cursor-pointer hover:bg-green-100 transition-colors" onclick="showDetailRecords('graded', '${selectedMonth}')">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-green-600 text-sm font-medium">批改完成</p>
+                            <p class="text-3xl font-bold text-green-800">${totalGraded}</p>
+                        </div>
+                        <div class="text-green-500 text-2xl">✅</div>
+                    </div>
+                </div>
+            `;
         }
 
-        // 顯示主頁面
-        function showMainPage() {
-            document.getElementById('detailPage').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
-            loadData();
+        // 顯示詳細記錄
+        function showDetailRecords(type, month) {
+            document.getElementById('manage-type').value = type;
+            document.getElementById('manage-month').value = month;
+            loadManageRecords();
+            showSection('manage');
+        }
+
+        // 載入管理記錄
+        function loadManageRecords() {
+            const type = document.getElementById('manage-type').value;
+            const month = document.getElementById('manage-month').value;
+            
+            let data = [];
+            switch(type) {
+                case 'homework':
+                    data = homeworkData;
+                    break;
+                case 'missing':
+                    data = missingData;
+                    break;
+                case 'graded':
+                    data = gradedData;
+                    break;
+            }
+            
+            // 篩選該月份的記錄
+            const filteredData = month ? 
+                data.filter(record => record.date.startsWith(month)) : 
+                data;
+            
+            const container = document.getElementById('manage-records');
+            
+            if (filteredData.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">暫無記錄</p>';
+                return;
+            }
+            
+            container.innerHTML = filteredData.map(record => {
+                let content = '';
+                switch(type) {
+                    case 'homework':
+                        content = `
+                            <div class="flex-1">
+                                <div class="font-medium text-gray-800">${record.subject} - ${record.date}</div>
+                                <div class="text-gray-600 text-sm mt-1">${record.content}</div>
+                            </div>
+                        `;
+                        break;
+                    case 'missing':
+                        content = `
+                            <div class="flex-1">
+                                <div class="font-medium text-gray-800">${record.subject} - ${record.date}</div>
+                                <div class="text-gray-600 text-sm mt-1">學生：${record.student}</div>
+                                <div class="text-gray-600 text-sm">欠交：${record.homework}</div>
+                            </div>
+                        `;
+                        break;
+                    case 'graded':
+                        content = `
+                            <div class="flex-1">
+                                <div class="font-medium text-gray-800">${record.subject} - ${record.date}</div>
+                                <div class="text-gray-600 text-sm mt-1">數量：${record.count} 份</div>
+                                <div class="text-gray-600 text-sm">內容：${record.homework}</div>
+                            </div>
+                        `;
+                        break;
+                }
+                
+                return `
+                    <div class="bg-gray-50 p-4 rounded-lg flex items-center justify-between">
+                        ${content}
+                        <div class="flex gap-2">
+                            <button onclick="editRecord('${type}', ${record.id})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                編輯
+                            </button>
+                            <button onclick="deleteRecord('${type}', ${record.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                刪除
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // 編輯記錄
         function editRecord(type, id) {
-            const records = JSON.parse(localStorage.getItem(`${type}_${currentDate}`) || '[]');
-            const record = records.find(r => r.id === id);
-            
-            if (!record) return;
-
-            document.getElementById('editId').value = id;
-            document.getElementById('editType').value = type;
-            document.getElementById('editSubject').value = record.subject;
-
-            let fieldsHtml = '';
-            if (type === 'homework') {
-                fieldsHtml = `
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">功課內容</label>
-                        <textarea id="editContent" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg">${record.content}</textarea>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">截止日期</label>
-                        <input type="date" id="editDueDate" value="${record.dueDate || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                    </div>
-                `;
-            } else if (type === 'missing') {
-                fieldsHtml = `
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">學生姓名</label>
-                        <input type="text" id="editStudentName" value="${record.studentName}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">欠交功課</label>
-                        <input type="text" id="editHomework" value="${record.homework}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                    </div>
-                `;
-            } else if (type === 'graded') {
-                fieldsHtml = `
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">功課類型</label>
-                        <input type="text" id="editHomework" value="${record.homework}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">批改數量</label>
-                        <input type="number" id="editCount" value="${record.count}" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                    </div>
-                `;
+            let data = [];
+            switch(type) {
+                case 'homework':
+                    data = homeworkData;
+                    break;
+                case 'missing':
+                    data = missingData;
+                    break;
+                case 'graded':
+                    data = gradedData;
+                    break;
             }
-
-            document.getElementById('editFields').innerHTML = fieldsHtml;
-            document.getElementById('editModal').classList.remove('hidden');
-            document.getElementById('editModal').classList.add('flex');
+            
+            const record = data.find(r => r.id === id);
+            if (!record) return;
+            
+            currentEditRecord = record;
+            currentEditType = type;
+            
+            let formContent = '';
+            switch(type) {
+                case 'homework':
+                    formContent = `
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
+                                <input type="date" id="edit-date" value="${record.date}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
+                                <select id="edit-subject" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                    <option value="中文" ${record.subject === '中文' ? 'selected' : ''}>中文</option>
+                                    <option value="英文" ${record.subject === '英文' ? 'selected' : ''}>英文</option>
+                                    <option value="數學" ${record.subject === '數學' ? 'selected' : ''}>數學</option>
+                                    <option value="常識" ${record.subject === '常識' ? 'selected' : ''}>常識</option>
+                                    <option value="人文" ${record.subject === '人文' ? 'selected' : ''}>人文</option>
+                                    <option value="科學" ${record.subject === '科學' ? 'selected' : ''}>科學</option>
+                                    <option value="電腦" ${record.subject === '電腦' ? 'selected' : ''}>電腦</option>
+                                    <option value="班務" ${record.subject === '班務' ? 'selected' : ''}>班務</option>
+                                    <option value="其他" ${record.subject === '其他' ? 'selected' : ''}>其他</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">內容</label>
+                                <textarea id="edit-content" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg">${record.content}</textarea>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'missing':
+                    formContent = `
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
+                                <input type="date" id="edit-date" value="${record.date}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
+                                <select id="edit-subject" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                    <option value="中文" ${record.subject === '中文' ? 'selected' : ''}>中文</option>
+                                    <option value="英文" ${record.subject === '英文' ? 'selected' : ''}>英文</option>
+                                    <option value="數學" ${record.subject === '數學' ? 'selected' : ''}>數學</option>
+                                    <option value="常識" ${record.subject === '常識' ? 'selected' : ''}>常識</option>
+                                    <option value="人文" ${record.subject === '人文' ? 'selected' : ''}>人文</option>
+                                    <option value="科學" ${record.subject === '科學' ? 'selected' : ''}>科學</option>
+                                    <option value="電腦" ${record.subject === '電腦' ? 'selected' : ''}>電腦</option>
+                                    <option value="班務" ${record.subject === '班務' ? 'selected' : ''}>班務</option>
+                                    <option value="其他" ${record.subject === '其他' ? 'selected' : ''}>其他</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">學生姓名</label>
+                                <input type="text" id="edit-student" value="${record.student}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">欠交功課</label>
+                                <input type="text" id="edit-homework" value="${record.homework}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'graded':
+                    formContent = `
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
+                                <input type="date" id="edit-date" value="${record.date}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">科目</label>
+                                <select id="edit-subject" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                    <option value="中文" ${record.subject === '中文' ? 'selected' : ''}>中文</option>
+                                    <option value="英文" ${record.subject === '英文' ? 'selected' : ''}>英文</option>
+                                    <option value="數學" ${record.subject === '數學' ? 'selected' : ''}>數學</option>
+                                    <option value="常識" ${record.subject === '常識' ? 'selected' : ''}>常識</option>
+                                    <option value="人文" ${record.subject === '人文' ? 'selected' : ''}>人文</option>
+                                    <option value="科學" ${record.subject === '科學' ? 'selected' : ''}>科學</option>
+                                    <option value="電腦" ${record.subject === '電腦' ? 'selected' : ''}>電腦</option>
+                                    <option value="班務" ${record.subject === '班務' ? 'selected' : ''}>班務</option>
+                                    <option value="其他" ${record.subject === '其他' ? 'selected' : ''}>其他</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">批改數量</label>
+                                <input type="number" id="edit-count" value="${record.count}" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">功課內容</label>
+                                <input type="text" id="edit-homework" value="${record.homework}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            document.getElementById('edit-form-content').innerHTML = formContent;
+            document.getElementById('edit-modal').classList.remove('hidden');
+            document.getElementById('edit-modal').classList.add('flex');
         }
 
-        // 處理編輯提交
-        function handleEditSubmit(e) {
-            e.preventDefault();
+        // 保存編輯
+        function saveEdit() {
+            if (!currentEditRecord || !currentEditType) return;
             
-            const type = document.getElementById('editType').value;
-            const id = parseInt(document.getElementById('editId').value);
-            const records = JSON.parse(localStorage.getItem(`${type}_${currentDate}`) || '[]');
-            const recordIndex = records.findIndex(r => r.id === id);
+            const date = document.getElementById('edit-date').value;
+            const subject = document.getElementById('edit-subject').value;
             
-            if (recordIndex === -1) return;
-
+            if (!date || !subject) {
+                alert('請填寫所有必填欄位！');
+                return;
+            }
+            
             // 更新記錄
-            records[recordIndex].subject = document.getElementById('editSubject').value;
-            
-            if (type === 'homework') {
-                records[recordIndex].content = document.getElementById('editContent').value;
-                records[recordIndex].dueDate = document.getElementById('editDueDate').value;
-            } else if (type === 'missing') {
-                records[recordIndex].studentName = document.getElementById('editStudentName').value;
-                records[recordIndex].homework = document.getElementById('editHomework').value;
-            } else if (type === 'graded') {
-                records[recordIndex].homework = document.getElementById('editHomework').value;
-                records[recordIndex].count = document.getElementById('editCount').value;
+            switch(currentEditType) {
+                case 'homework':
+                    const content = document.getElementById('edit-content').value;
+                    if (!content) {
+                        alert('請填寫功課內容！');
+                        return;
+                    }
+                    currentEditRecord.date = date;
+                    currentEditRecord.subject = subject;
+                    currentEditRecord.content = content;
+                    localStorage.setItem('homeworkData', JSON.stringify(homeworkData));
+                    break;
+                case 'missing':
+                    const student = document.getElementById('edit-student').value;
+                    const homework = document.getElementById('edit-homework').value;
+                    if (!student || !homework) {
+                        alert('請填寫所有欄位！');
+                        return;
+                    }
+                    currentEditRecord.date = date;
+                    currentEditRecord.subject = subject;
+                    currentEditRecord.student = student;
+                    currentEditRecord.homework = homework;
+                    localStorage.setItem('missingData', JSON.stringify(missingData));
+                    break;
+                case 'graded':
+                    const count = document.getElementById('edit-count').value;
+                    const gradedHomework = document.getElementById('edit-homework').value;
+                    if (!count || !gradedHomework) {
+                        alert('請填寫所有欄位！');
+                        return;
+                    }
+                    currentEditRecord.date = date;
+                    currentEditRecord.subject = subject;
+                    currentEditRecord.count = parseInt(count);
+                    currentEditRecord.homework = gradedHomework;
+                    localStorage.setItem('gradedData', JSON.stringify(gradedData));
+                    break;
             }
-
-            localStorage.setItem(`${type}_${currentDate}`, JSON.stringify(records));
+            
             closeEditModal();
-            
-            if (currentDetailType) {
-                loadDetailRecords(currentDetailType);
-            } else {
-                loadData();
-            }
-            
-            // 如果編輯的是月份記錄，也要更新月份總結
-            loadMonthlyData();
-            
+            loadManageRecords();
+            updateSummary();
             alert('記錄已更新！');
         }
 
         // 關閉編輯模態框
         function closeEditModal() {
-            document.getElementById('editModal').classList.add('hidden');
-            document.getElementById('editModal').classList.remove('flex');
-        }
-
-        // 編輯月份記錄
-        function editMonthlyRecord(type, id, date) {
-            const records = JSON.parse(localStorage.getItem(`${type}_${date}`) || '[]');
-            const record = records.find(r => r.id === id);
-            
-            if (!record) return;
-
-            // 暫時設置當前日期為記錄日期，以便編輯功能正常工作
-            const originalDate = currentDate;
-            currentDate = date;
-            
-            editRecord(type, id);
-            
-            // 恢復原始日期
-            currentDate = originalDate;
-        }
-
-        // 刪除月份記錄
-        function deleteMonthlyRecord(type, id, date) {
-            if (!confirm('確定要刪除這筆記錄嗎？')) return;
-            
-            const records = JSON.parse(localStorage.getItem(`${type}_${date}`) || '[]');
-            const filteredRecords = records.filter(r => r.id !== id);
-            localStorage.setItem(`${type}_${date}`, JSON.stringify(filteredRecords));
-            
-            loadMonthlyData();
-            alert('記錄已刪除！');
+            document.getElementById('edit-modal').classList.add('hidden');
+            document.getElementById('edit-modal').classList.remove('flex');
+            currentEditRecord = null;
+            currentEditType = null;
         }
 
         // 刪除記錄
         function deleteRecord(type, id) {
             if (!confirm('確定要刪除這筆記錄嗎？')) return;
             
-            const records = JSON.parse(localStorage.getItem(`${type}_${currentDate}`) || '[]');
-            const filteredRecords = records.filter(r => r.id !== id);
-            localStorage.setItem(`${type}_${currentDate}`, JSON.stringify(filteredRecords));
-            
-            if (currentDetailType) {
-                loadDetailRecords(currentDetailType);
-            } else {
-                loadData();
+            switch(type) {
+                case 'homework':
+                    homeworkData = homeworkData.filter(record => record.id !== id);
+                    localStorage.setItem('homeworkData', JSON.stringify(homeworkData));
+                    break;
+                case 'missing':
+                    missingData = missingData.filter(record => record.id !== id);
+                    localStorage.setItem('missingData', JSON.stringify(missingData));
+                    break;
+                case 'graded':
+                    gradedData = gradedData.filter(record => record.id !== id);
+                    localStorage.setItem('gradedData', JSON.stringify(gradedData));
+                    break;
             }
             
+            loadManageRecords();
+            updateSummary();
             alert('記錄已刪除！');
         }
 
-        // 匯出當日Excel
-        function exportDailyToExcel() {
-            const homework = JSON.parse(localStorage.getItem(`homework_${currentDate}`) || '[]');
-            const missing = JSON.parse(localStorage.getItem(`missing_${currentDate}`) || '[]');
-            const graded = JSON.parse(localStorage.getItem(`graded_${currentDate}`) || '[]');
-
-            const wb = XLSX.utils.book_new();
-
-            // 功課發佈工作表
-            if (homework.length > 0) {
-                const homeworkData = homework.map(item => ({
-                    '科目': item.subject,
-                    '功課內容': item.content,
-                    '截止日期': item.dueDate || '',
-                    '發佈時間': item.timestamp
-                }));
-                const ws1 = XLSX.utils.json_to_sheet(homeworkData);
-                XLSX.utils.book_append_sheet(wb, ws1, '功課發佈');
-            }
-
-            // 欠交記錄工作表
-            if (missing.length > 0) {
-                const missingData = missing.map(item => ({
-                    '科目': item.subject,
-                    '學生姓名': item.studentName,
-                    '欠交功課': item.homework,
-                    '記錄時間': item.timestamp
-                }));
-                const ws2 = XLSX.utils.json_to_sheet(missingData);
-                XLSX.utils.book_append_sheet(wb, ws2, '欠交記錄');
-            }
-
-            // 批改記錄工作表
-            if (graded.length > 0) {
-                const gradedData = graded.map(item => ({
-                    '科目': item.subject,
-                    '功課類型': item.homework,
-                    '批改數量': item.count,
-                    '記錄時間': item.timestamp
-                }));
-                const ws3 = XLSX.utils.json_to_sheet(gradedData);
-                XLSX.utils.book_append_sheet(wb, ws3, '批改記錄');
-            }
-
-            if (wb.SheetNames.length === 0) {
-                alert('今日暫無記錄可匯出！');
+        // 匯出Excel
+        function exportToExcel() {
+            const selectedMonth = document.getElementById('summary-month').value;
+            if (!selectedMonth) {
+                alert('請選擇要匯出的月份！');
                 return;
             }
-
-            XLSX.writeFile(wb, `功課管理記錄_${currentDate}.xlsx`);
-        }
-
-        // 匯出整月Excel
-        function exportMonthlyToExcel() {
-            const monthlyData = getMonthlyRecords(currentMonth);
+            
+            // 篩選該月份的數據
+            const monthHomework = homeworkData.filter(record => 
+                record.date.startsWith(selectedMonth)
+            );
+            const monthMissing = missingData.filter(record => 
+                record.date.startsWith(selectedMonth)
+            );
+            const monthGraded = gradedData.filter(record => 
+                record.date.startsWith(selectedMonth)
+            );
+            
+            // 創建工作簿
             const wb = XLSX.utils.book_new();
-
-            // 功課發佈工作表
-            if (monthlyData.homework.length > 0) {
-                const homeworkData = monthlyData.homework.map(item => ({
-                    '日期': item.recordDate,
-                    '科目': item.subject,
-                    '功課內容': item.content,
-                    '截止日期': item.dueDate || '',
-                    '發佈時間': item.timestamp
-                }));
-                const ws1 = XLSX.utils.json_to_sheet(homeworkData);
-                XLSX.utils.book_append_sheet(wb, ws1, '功課發佈');
-            }
-
+            
+            // 發佈功課工作表
+            const homeworkWS = XLSX.utils.json_to_sheet(
+                monthHomework.map(record => ({
+                    '日期': record.date,
+                    '科目': record.subject,
+                    '功課內容': record.content
+                }))
+            );
+            XLSX.utils.book_append_sheet(wb, homeworkWS, '發佈功課');
+            
             // 欠交記錄工作表
-            if (monthlyData.missing.length > 0) {
-                const missingData = monthlyData.missing.map(item => ({
-                    '日期': item.recordDate,
-                    '科目': item.subject,
-                    '學生姓名': item.studentName,
-                    '欠交功課': item.homework,
-                    '記錄時間': item.timestamp
-                }));
-                const ws2 = XLSX.utils.json_to_sheet(missingData);
-                XLSX.utils.book_append_sheet(wb, ws2, '欠交記錄');
-            }
-
-            // 批改記錄工作表
-            if (monthlyData.graded.length > 0) {
-                const gradedData = monthlyData.graded.map(item => ({
-                    '日期': item.recordDate,
-                    '科目': item.subject,
-                    '功課類型': item.homework,
-                    '批改數量': item.count,
-                    '記錄時間': item.timestamp
-                }));
-                const ws3 = XLSX.utils.json_to_sheet(gradedData);
-                XLSX.utils.book_append_sheet(wb, ws3, '批改記錄');
-            }
-
-            // 月份統計工作表
-            const totalHomework = monthlyData.homework.length;
-            const totalMissing = monthlyData.missing.length;
-            const totalGraded = monthlyData.graded.reduce((sum, item) => sum + parseInt(item.count || 0), 0);
-
-            const summaryData = [
-                { '統計項目': '發佈功課總數', '數量': totalHomework },
-                { '統計項目': '欠交記錄總數', '數量': totalMissing },
-                { '統計項目': '批改總數量', '數量': totalGraded }
-            ];
-            const ws4 = XLSX.utils.json_to_sheet(summaryData);
-            XLSX.utils.book_append_sheet(wb, ws4, '月份統計');
-
-            if (wb.SheetNames.length === 0) {
-                alert('本月暫無記錄可匯出！');
-                return;
-            }
-
-            XLSX.writeFile(wb, `功課管理記錄_${currentMonth}.xlsx`);
+            const missingWS = XLSX.utils.json_to_sheet(
+                monthMissing.map(record => ({
+                    '日期': record.date,
+                    '科目': record.subject,
+                    '學生姓名': record.student,
+                    '欠交功課': record.homework
+                }))
+            );
+            XLSX.utils.book_append_sheet(wb, missingWS, '欠交記錄');
+            
+            // 批改完成工作表
+            const gradedWS = XLSX.utils.json_to_sheet(
+                monthGraded.map(record => ({
+                    '日期': record.date,
+                    '科目': record.subject,
+                    '批改數量': record.count,
+                    '功課內容': record.homework
+                }))
+            );
+            XLSX.utils.book_append_sheet(wb, gradedWS, '批改完成');
+            
+            // 下載文件
+            const fileName = `功課管理記錄_${selectedMonth}.xlsx`;
+            XLSX.writeFile(wb, fileName);
         }
+
+        // 點擊模態框外部關閉
+        document.getElementById('edit-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
+            }
+        });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9826b489456e04ec',t:'MTc1ODQyNzc0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9826ccac7644f4f8',t:'MTc1ODQyODczNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

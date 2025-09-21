@@ -19,11 +19,17 @@
             <p class="text-gray-600">輕鬆管理每日功課、追蹤進度</p>
         </div>
 
-        <!-- 日期選擇器 -->
+        <!-- 日期和月份選擇器 -->
         <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold text-gray-800">📅 選擇日期</h2>
-                <input type="date" id="selectedDate" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">📅 選擇日期</h2>
+                    <input type="date" id="selectedDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">📊 查看月份總結</h2>
+                    <input type="month" id="selectedMonth" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                </div>
             </div>
         </div>
 
@@ -167,13 +173,16 @@
                 </form>
             </div>
 
-            <!-- 每日總結 -->
+            <!-- 每月總結 -->
             <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-semibold text-gray-800">📊 每日總結</h3>
-                    <button onclick="exportToExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium">📥 匯出Excel</button>
+                    <h3 class="text-xl font-semibold text-gray-800">📊 每月總結</h3>
+                    <div class="flex space-x-2">
+                        <button onclick="exportDailyToExcel()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">📥 匯出當日</button>
+                        <button onclick="exportMonthlyToExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium">📥 匯出整月</button>
+                    </div>
                 </div>
-                <div id="dailySummary" class="space-y-4">
+                <div id="monthlySummary" class="space-y-4">
                     <!-- 動態生成內容 -->
                 </div>
             </div>
@@ -228,12 +237,15 @@
     <script>
         // 全局變數
         let currentDate = new Date().toISOString().split('T')[0];
+        let currentMonth = new Date().toISOString().slice(0, 7);
         let currentDetailType = '';
 
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('selectedDate').value = currentDate;
+            document.getElementById('selectedMonth').value = currentMonth;
             loadData();
+            loadMonthlyData();
             setupEventListeners();
         });
 
@@ -243,6 +255,12 @@
             document.getElementById('selectedDate').addEventListener('change', function() {
                 currentDate = this.value;
                 loadData();
+            });
+
+            // 月份變更
+            document.getElementById('selectedMonth').addEventListener('change', function() {
+                currentMonth = this.value;
+                loadMonthlyData();
             });
 
             // 選項卡切換
@@ -354,65 +372,137 @@
             updateDailySummary(homework, missing, graded);
         }
 
-        // 更新每日總結
-        function updateDailySummary(homework, missing, graded) {
-            const summaryDiv = document.getElementById('dailySummary');
+        // 載入月份數據
+        function loadMonthlyData() {
+            const monthlyData = getMonthlyRecords(currentMonth);
+            updateMonthlySummary(monthlyData);
+        }
+
+        // 獲取月份記錄
+        function getMonthlyRecords(month) {
+            const allRecords = { homework: [], missing: [], graded: [] };
+            
+            // 獲取該月份所有日期的記錄
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.includes(month)) {
+                    const [type, date] = key.split('_');
+                    if (['homework', 'missing', 'graded'].includes(type)) {
+                        const records = JSON.parse(localStorage.getItem(key) || '[]');
+                        records.forEach(record => {
+                            record.recordDate = date; // 添加記錄日期
+                        });
+                        allRecords[type] = allRecords[type].concat(records);
+                    }
+                }
+            }
+            
+            return allRecords;
+        }
+
+        // 更新每月總結
+        function updateMonthlySummary(monthlyData) {
+            const summaryDiv = document.getElementById('monthlySummary');
             let html = '';
 
-            if (homework.length === 0 && missing.length === 0 && graded.length === 0) {
-                html = '<p class="text-gray-500 text-center py-8">今日暫無記錄</p>';
+            const totalHomework = monthlyData.homework.length;
+            const totalMissing = monthlyData.missing.length;
+            const totalGraded = monthlyData.graded.reduce((sum, item) => sum + parseInt(item.count || 0), 0);
+
+            if (totalHomework === 0 && totalMissing === 0 && totalGraded === 0) {
+                html = '<p class="text-gray-500 text-center py-8">本月暫無記錄</p>';
             } else {
-                // 功課發佈
-                if (homework.length > 0) {
-                    html += '<div class="border-l-4 border-blue-500 pl-4"><h4 class="font-semibold text-blue-700 mb-2">📝 今日發佈功課</h4>';
-                    homework.forEach(item => {
-                        html += `<div class="bg-blue-50 p-3 rounded-lg mb-2 flex justify-between items-start">
-                            <div>
-                                <span class="font-medium">${item.subject}</span> - ${item.content}
-                                ${item.dueDate ? `<br><small class="text-gray-600">截止：${item.dueDate}</small>` : ''}
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="editRecord('homework', ${item.id})" class="text-blue-600 hover:text-blue-800">✏️</button>
-                                <button onclick="deleteRecord('homework', ${item.id})" class="text-red-600 hover:text-red-800">🗑️</button>
-                            </div>
-                        </div>`;
-                    });
-                    html += '</div>';
-                }
+                // 月份統計
+                html += `<div class="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg mb-6">
+                    <h4 class="font-bold text-lg mb-2">📊 ${currentMonth} 月份統計</h4>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div class="bg-white p-3 rounded-lg">
+                            <div class="text-2xl font-bold text-blue-600">${totalHomework}</div>
+                            <div class="text-sm text-gray-600">發佈功課</div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg">
+                            <div class="text-2xl font-bold text-red-600">${totalMissing}</div>
+                            <div class="text-sm text-gray-600">欠交記錄</div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg">
+                            <div class="text-2xl font-bold text-green-600">${totalGraded}</div>
+                            <div class="text-sm text-gray-600">批改數量</div>
+                        </div>
+                    </div>
+                </div>`;
 
-                // 欠交記錄
-                if (missing.length > 0) {
-                    html += '<div class="border-l-4 border-red-500 pl-4"><h4 class="font-semibold text-red-700 mb-2">⚠️ 欠交記錄</h4>';
-                    missing.forEach(item => {
-                        html += `<div class="bg-red-50 p-3 rounded-lg mb-2 flex justify-between items-start">
-                            <div>
-                                <span class="font-medium">${item.subject}</span> - ${item.studentName} 欠交：${item.homework}
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="editRecord('missing', ${item.id})" class="text-blue-600 hover:text-blue-800">✏️</button>
-                                <button onclick="deleteRecord('missing', ${item.id})" class="text-red-600 hover:text-red-800">🗑️</button>
-                            </div>
-                        </div>`;
+                // 按日期分組顯示
+                const dateGroups = {};
+                ['homework', 'missing', 'graded'].forEach(type => {
+                    monthlyData[type].forEach(record => {
+                        if (!dateGroups[record.recordDate]) {
+                            dateGroups[record.recordDate] = { homework: [], missing: [], graded: [] };
+                        }
+                        dateGroups[record.recordDate][type].push(record);
                     });
-                    html += '</div>';
-                }
+                });
 
-                // 批改記錄
-                if (graded.length > 0) {
-                    html += '<div class="border-l-4 border-green-500 pl-4"><h4 class="font-semibold text-green-700 mb-2">✅ 批改記錄</h4>';
-                    graded.forEach(item => {
-                        html += `<div class="bg-green-50 p-3 rounded-lg mb-2 flex justify-between items-start">
-                            <div>
-                                <span class="font-medium">${item.subject}</span> - ${item.homework} (${item.count}份)
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="editRecord('graded', ${item.id})" class="text-blue-600 hover:text-blue-800">✏️</button>
-                                <button onclick="deleteRecord('graded', ${item.id})" class="text-red-600 hover:text-red-800">🗑️</button>
-                            </div>
-                        </div>`;
-                    });
+                const sortedDates = Object.keys(dateGroups).sort().reverse();
+                
+                sortedDates.forEach(date => {
+                    const dateData = dateGroups[date];
+                    html += `<div class="border border-gray-200 rounded-lg p-4 mb-4">
+                        <h5 class="font-semibold text-lg mb-3 text-gray-800">📅 ${date}</h5>`;
+
+                    // 功課發佈
+                    if (dateData.homework.length > 0) {
+                        html += '<div class="border-l-4 border-blue-500 pl-4 mb-3"><h6 class="font-medium text-blue-700 mb-2">📝 發佈功課</h6>';
+                        dateData.homework.forEach(item => {
+                            html += `<div class="bg-blue-50 p-3 rounded-lg mb-2 flex justify-between items-start">
+                                <div>
+                                    <span class="font-medium">${item.subject}</span> - ${item.content}
+                                    ${item.dueDate ? `<br><small class="text-gray-600">截止：${item.dueDate}</small>` : ''}
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="editMonthlyRecord('homework', ${item.id}, '${date}')" class="text-blue-600 hover:text-blue-800">✏️</button>
+                                    <button onclick="deleteMonthlyRecord('homework', ${item.id}, '${date}')" class="text-red-600 hover:text-red-800">🗑️</button>
+                                </div>
+                            </div>`;
+                        });
+                        html += '</div>';
+                    }
+
+                    // 欠交記錄
+                    if (dateData.missing.length > 0) {
+                        html += '<div class="border-l-4 border-red-500 pl-4 mb-3"><h6 class="font-medium text-red-700 mb-2">⚠️ 欠交記錄</h6>';
+                        dateData.missing.forEach(item => {
+                            html += `<div class="bg-red-50 p-3 rounded-lg mb-2 flex justify-between items-start">
+                                <div>
+                                    <span class="font-medium">${item.subject}</span> - ${item.studentName} 欠交：${item.homework}
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="editMonthlyRecord('missing', ${item.id}, '${date}')" class="text-blue-600 hover:text-blue-800">✏️</button>
+                                    <button onclick="deleteMonthlyRecord('missing', ${item.id}, '${date}')" class="text-red-600 hover:text-red-800">🗑️</button>
+                                </div>
+                            </div>`;
+                        });
+                        html += '</div>';
+                    }
+
+                    // 批改記錄
+                    if (dateData.graded.length > 0) {
+                        html += '<div class="border-l-4 border-green-500 pl-4"><h6 class="font-medium text-green-700 mb-2">✅ 批改記錄</h6>';
+                        dateData.graded.forEach(item => {
+                            html += `<div class="bg-green-50 p-3 rounded-lg mb-2 flex justify-between items-start">
+                                <div>
+                                    <span class="font-medium">${item.subject}</span> - ${item.homework} (${item.count}份)
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="editMonthlyRecord('graded', ${item.id}, '${date}')" class="text-blue-600 hover:text-blue-800">✏️</button>
+                                    <button onclick="deleteMonthlyRecord('graded', ${item.id}, '${date}')" class="text-red-600 hover:text-red-800">🗑️</button>
+                                </div>
+                            </div>`;
+                        });
+                        html += '</div>';
+                    }
+
                     html += '</div>';
-                }
+                });
             }
 
             summaryDiv.innerHTML = html;
@@ -569,6 +659,9 @@
                 loadData();
             }
             
+            // 如果編輯的是月份記錄，也要更新月份總結
+            loadMonthlyData();
+            
             alert('記錄已更新！');
         }
 
@@ -576,6 +669,35 @@
         function closeEditModal() {
             document.getElementById('editModal').classList.add('hidden');
             document.getElementById('editModal').classList.remove('flex');
+        }
+
+        // 編輯月份記錄
+        function editMonthlyRecord(type, id, date) {
+            const records = JSON.parse(localStorage.getItem(`${type}_${date}`) || '[]');
+            const record = records.find(r => r.id === id);
+            
+            if (!record) return;
+
+            // 暫時設置當前日期為記錄日期，以便編輯功能正常工作
+            const originalDate = currentDate;
+            currentDate = date;
+            
+            editRecord(type, id);
+            
+            // 恢復原始日期
+            currentDate = originalDate;
+        }
+
+        // 刪除月份記錄
+        function deleteMonthlyRecord(type, id, date) {
+            if (!confirm('確定要刪除這筆記錄嗎？')) return;
+            
+            const records = JSON.parse(localStorage.getItem(`${type}_${date}`) || '[]');
+            const filteredRecords = records.filter(r => r.id !== id);
+            localStorage.setItem(`${type}_${date}`, JSON.stringify(filteredRecords));
+            
+            loadMonthlyData();
+            alert('記錄已刪除！');
         }
 
         // 刪除記錄
@@ -595,8 +717,8 @@
             alert('記錄已刪除！');
         }
 
-        // 匯出Excel
-        function exportToExcel() {
+        // 匯出當日Excel
+        function exportDailyToExcel() {
             const homework = JSON.parse(localStorage.getItem(`homework_${currentDate}`) || '[]');
             const missing = JSON.parse(localStorage.getItem(`missing_${currentDate}`) || '[]');
             const graded = JSON.parse(localStorage.getItem(`graded_${currentDate}`) || '[]');
@@ -646,6 +768,71 @@
 
             XLSX.writeFile(wb, `功課管理記錄_${currentDate}.xlsx`);
         }
+
+        // 匯出整月Excel
+        function exportMonthlyToExcel() {
+            const monthlyData = getMonthlyRecords(currentMonth);
+            const wb = XLSX.utils.book_new();
+
+            // 功課發佈工作表
+            if (monthlyData.homework.length > 0) {
+                const homeworkData = monthlyData.homework.map(item => ({
+                    '日期': item.recordDate,
+                    '科目': item.subject,
+                    '功課內容': item.content,
+                    '截止日期': item.dueDate || '',
+                    '發佈時間': item.timestamp
+                }));
+                const ws1 = XLSX.utils.json_to_sheet(homeworkData);
+                XLSX.utils.book_append_sheet(wb, ws1, '功課發佈');
+            }
+
+            // 欠交記錄工作表
+            if (monthlyData.missing.length > 0) {
+                const missingData = monthlyData.missing.map(item => ({
+                    '日期': item.recordDate,
+                    '科目': item.subject,
+                    '學生姓名': item.studentName,
+                    '欠交功課': item.homework,
+                    '記錄時間': item.timestamp
+                }));
+                const ws2 = XLSX.utils.json_to_sheet(missingData);
+                XLSX.utils.book_append_sheet(wb, ws2, '欠交記錄');
+            }
+
+            // 批改記錄工作表
+            if (monthlyData.graded.length > 0) {
+                const gradedData = monthlyData.graded.map(item => ({
+                    '日期': item.recordDate,
+                    '科目': item.subject,
+                    '功課類型': item.homework,
+                    '批改數量': item.count,
+                    '記錄時間': item.timestamp
+                }));
+                const ws3 = XLSX.utils.json_to_sheet(gradedData);
+                XLSX.utils.book_append_sheet(wb, ws3, '批改記錄');
+            }
+
+            // 月份統計工作表
+            const totalHomework = monthlyData.homework.length;
+            const totalMissing = monthlyData.missing.length;
+            const totalGraded = monthlyData.graded.reduce((sum, item) => sum + parseInt(item.count || 0), 0);
+
+            const summaryData = [
+                { '統計項目': '發佈功課總數', '數量': totalHomework },
+                { '統計項目': '欠交記錄總數', '數量': totalMissing },
+                { '統計項目': '批改總數量', '數量': totalGraded }
+            ];
+            const ws4 = XLSX.utils.json_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, ws4, '月份統計');
+
+            if (wb.SheetNames.length === 0) {
+                alert('本月暫無記錄可匯出！');
+                return;
+            }
+
+            XLSX.writeFile(wb, `功課管理記錄_${currentMonth}.xlsx`);
+        }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9822bc8a412185c7',t:'MTc1ODM4NjEzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9826b489456e04ec',t:'MTc1ODQyNzc0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
